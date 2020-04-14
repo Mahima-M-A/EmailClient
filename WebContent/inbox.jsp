@@ -11,7 +11,7 @@
 <h1> Inbox</h1>
 	<input type="button" value="Back" name="back" onclick="openPage('emailClient.jsp')"/>
 	<input type="button" value="Compose" name="compose" onclick="openPage('compose.jsp')"/>
-	<input type="button" value="Sign out" name="inbox" onclick="openPage('index.jsp')"/>
+	<input type="button" value="Sign out" name="signout" onclick="openPage('index.jsp')"/>
 	<%  String mailId = (String)session.getAttribute("mailId");
 		String pwd = (String)session.getAttribute("pwd");
 		EmailReceiver er = new EmailReceiver();

@@ -24,7 +24,7 @@
 	<h3>Welcome <i><% out.println(mailId); %></i></h3><br><br>
 	<input type="button" value="Compose" name="compose" onclick="openPage('compose.jsp')"/>
 	<input type="button" value="Inbox" name="inbox" onclick="openPage('inbox.jsp')"/>
-	<input type="button" value="Sign out" name="inbox" onclick="openPage('index.jsp')"/>
+	<input type="button" value="Sign out" name="signout" onclick="openPage('index.jsp')"/>
 	<script type="text/javascript">
 		function openPage(pageURL) {
 			window.location.href = pageURL;
