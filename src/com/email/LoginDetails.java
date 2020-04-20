@@ -73,7 +73,9 @@ public class LoginDetails extends HttpServlet {
 	        requestDispatcher.forward(request, response);
 		}
 		else {
-			response.sendRedirect("index.jsp");
+			request.setAttribute("message", "Invalid credentials");
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
+	        requestDispatcher.forward(request, response);
 		}
 	}
 }

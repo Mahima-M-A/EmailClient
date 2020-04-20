@@ -1,0 +1,17 @@
+h1 {
+	color: #008CBA;
+}
+.button {
+	background-color: #008CBA;
+	border: 1px solid white;
+	border-radius: 15%;
+	color: white;
+	padding: 5px 10px;
+	text-align: center;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+}
+.button:hover {
+	background-color: #007AAA;
+}

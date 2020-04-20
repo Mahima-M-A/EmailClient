@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -20,7 +21,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.servlet.RequestDispatcher;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -61,15 +67,14 @@ public class EmailSender extends HttpServlet {
 		ArrayList<File> attachedFiles = saveAttachedFiles(request); //to store the attached files
 		
 		PrintWriter out = response.getWriter();
+		
 		try {
-			
 			//to set the SMTP server settings
 			Properties properties = new Properties();
 			properties.put("mail.smtp.host", host);
 			properties.put("mail.smtp.port", port);
 			properties.put("mail.smtp.auth", "true");
 			properties.put("mail.smtp.starttls.enable", "true");
-			
 			//to authenticate the mailId and password
 			Authenticator auth = new Authenticator() {
 				public PasswordAuthentication getPasswordAuthentication() {
@@ -113,29 +118,19 @@ public class EmailSender extends HttpServlet {
 	 
 	        //sets the multipart as e-mail's content
 	        message.setContent(multipart);
-			message.saveChanges();
-			Transport.send(message);
-			
-			//to send data to the redirected jsp file
-			request.setAttribute("mailId", sender);
-			request.setAttribute("pwd", password);
-			RequestDispatcher requestDispatcher = request.getRequestDispatcher("emailClient.jsp");
-	        requestDispatcher.forward(request, response);
+	        if(isAddressValid(recipient)) {
+	        	Transport.send(message);
+	        } else {
+	        	throw new Exception();
+	        }
 	        
 	        //to show an alert dialog box
-			out.println("<script language=\"javascript\">");
-			out.println("alert('Email was successfully sent')");
-			out.println("location='emailClient.jsp';");
-			out.println("</script>");
+	        out.println("<script language=\"javascript\">");
+	        out.println("alert('Email was successfully sent')");
+	        out.println("location='emailClient.jsp';");
+	        out.println("</script>");
 		}
 		catch(Exception e) {
-			e.printStackTrace();
-			
-			request.setAttribute("mailId", sender);
-			request.setAttribute("pwd", password);
-			RequestDispatcher requestDispatcher = request.getRequestDispatcher("emailClient.jsp");
-	        requestDispatcher.forward(request, response);
-	        
 			out.println("<script language=\"javascript\">");
 			out.println("alert('Email was not sent')");
 			out.println("location='emailClient.jsp';");
@@ -183,5 +178,55 @@ public class EmailSender extends HttpServlet {
             }
         }
 		return null;
+	}
+	
+	// returns the list of mail exchangers
+	private ArrayList getMX(String hostName) throws NamingException {
+		// Perform a DNS lookup for MX records in the domain
+		Hashtable env = new Hashtable();
+		env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
+		DirContext ictx = new InitialDirContext(env);
+		Attributes attrs = ictx.getAttributes(hostName, new String[]{"MX"});
+		Attribute attr = attrs.get("MX");
+		
+		// if we don't have an MX record, try the machine itself
+		if((attr == null) || (attr.size() == 0)) {
+			attrs = ictx.getAttributes(hostName, new String[]{"A"});
+	        attr = attrs.get("A");
+	        if( attr == null ) 
+	             throw new NamingException("No match for name '" + hostName + "'");
+		}
+	    // Return them as an array list
+		ArrayList res = new ArrayList();
+		NamingEnumeration en = attr.getAll();
+		while(en.hasMore()) {
+			String x = (String) en.next();
+			String f[] = x.split(" ");
+			if (f[1].endsWith(".")) {
+				f[1] = f[1].substring(0, (f[1].length() - 1));
+			}
+			res.add(f[1]);
+		}
+		return res;
+	}
+	
+	public boolean isAddressValid(String address) {
+		int pos = address.indexOf('@');
+		// If the address does not contain an '@', it's not valid
+		if (pos == -1) return false;
+		
+		// Isolate the domain/machine name and get a list of mail exchangers
+		String domain = address.substring(++pos);
+		ArrayList mxList = null;
+		try {
+			mxList = getMX(domain);
+		} catch (NamingException ex) {
+			return false;
+		}
+		
+		// if no mail exchanger is found then the domain is invalid
+		if(mxList.size() == 0) return false;
+		
+		return true;
 	}
 }

@@ -62,7 +62,7 @@ public class EmailReceiver {
             	Files.createDirectory(Paths.get(directory)); //to create the directory if not present
             }
             
-            inboxMsg += "<br><br><h4>Email Attachments will get stored in:</h4><br>" + directory + "<br><br>"; 
+            inboxMsg += "<br><h4>Email Attachments will get stored in:</h4><br>" + directory + "<br><br>"; 
             //to connect to the message store
             Store store = session.getStore(protocol);
             store.connect(userName, password);
@@ -115,14 +115,15 @@ public class EmailReceiver {
                 }
                 
                 //concatenate all the extracted content
-                inboxMsg += "<br><br>Message #" + (i + 1) + ":";
-                inboxMsg += "<br>&nbspFrom: " + from;
-                inboxMsg += "<br>&nbspTo: " + toList;
-                inboxMsg += "<br>&nbspCC: " + ccList;
-                inboxMsg += "<br>&nbspSubject: " + subject;
-                inboxMsg += "<br>&nbspSent Date: " + sentDate;
-                inboxMsg += "<br>&nbspMessage: " + messageContent;
-                inboxMsg += "<br>&nbspAttachments: " + (attachedFiles.isEmpty() ? "No attachments" : attachedFiles.substring(0, attachedFiles.length() - 2));
+                inboxMsg += "<br><br><fieldset style=\"border-width:5px\">";
+                inboxMsg += "<legend style=\"font-size:20px\">Message #" + (i + 1) + "</legend>";
+                inboxMsg += "<br>&nbsp<b>From:</b> " + from;
+                inboxMsg += "<br>&nbsp<b>To:</b> " + toList;
+                inboxMsg += "<br>&nbsp<b>CC:</b> " + ccList;
+                inboxMsg += "<br>&nbsp<b>Subject:</b> " + subject;
+                inboxMsg += "<br>&nbsp<b>Sent Date:</b> " + sentDate;
+                inboxMsg += "<br>&nbsp<b>Message:</b> " + messageContent;
+                inboxMsg += "<br>&nbsp<b>Attachments:</b> " + (attachedFiles.isEmpty() ? "No attachments" : attachedFiles.substring(0, attachedFiles.length() - 2)) + "</fieldset>";
             }
             
             folderInbox.close(false); //close the inbox folder
