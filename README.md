@@ -11,7 +11,7 @@ Once cloned, the app may be run through appropriate softwares, such as eclipse.
 
 ## Usage
 
-Open the app, and make sure it has the required external jar files(javax.mail.jar and servlet-api.jar(Tomcat server)). Also make sure that the radio button for allowing less secure apps is turned ON in your gmail security settings before running this app. You can simply run the index.jsp file on server(Tomcat) to checkout the functionalities of this app.
+Open the app, and make sure it has the required external jar files(javax.mail.jar and servlet-api.jar(Tomcat server)) available in the WEB_INF/lib folder. Also make sure that the radio button for allowing less secure apps is turned ON in your gmail security settings before running this app. You can simply run the index.jsp file on server(Tomcat) to checkout the functionalities of this app.
 
 ## Functionalities
 
